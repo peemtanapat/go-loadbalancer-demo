@@ -34,7 +34,7 @@ func main() {
 			Status: "healthy",
 			Instance: instanceName,
 			Port: port,
-			Timestamp: time.Now(),
+			Timestamp: time.Now().UTC(),
 		}
 
 		w.Header().Set("Content-type", "application/json")
@@ -48,6 +48,7 @@ func main() {
 					Users: []string{"Alice", "Bird", "Charlie", "Dan"},
 					ServedBy: instanceName,
 					Port: port,
+					Timestamp: time.Now().UTC(),
 				}
 
 				w.Header().Set("Content-type", "application/json")
@@ -61,6 +62,7 @@ func main() {
 					User: user,
 					ServedBy: instanceName,
 					Port: port,
+					Timestamp: time.Now().UTC(),
 				}
 
 				w.Header().Set("Content-Type", "application/json")
@@ -78,6 +80,7 @@ func main() {
 			ProcessingTime: int64(time.Since(startTime).Milliseconds()),
 			ServedBy: instanceName,
 			Port: port,
+			Timestamp: time.Now().UTC(),
 		}
 
 		w.Header().Set("Content-Type", "application/json")
