@@ -19,8 +19,8 @@ type Response struct {
 	Users     	[]string    `json:"users,omitempty"`
 	ServedBy  	string      `json:"servedBy,omitempty"`
 	Message   	string      `json:"message,omitempty"`
-	User      	interface{} `json:"user,omitempty"`
-	ProcessingTime int64  	`json:"processingTime,omitempty"`
+	User      	any			`json:"user,omitempty"`
+	ProcessingTime int64  	`json:"processingTimeMs,omitempty"`
 }
 
 func main() {
@@ -67,6 +67,24 @@ func main() {
 				json.NewEncoder(w).Encode(response)
 		}
 	}).Methods("GET", "POST")
+
+	router.HandleFunc("/api/heavy-task", func(w http.ResponseWriter, r *http.Request) {
+		startTime := time.Now()
+
+		time.Sleep(2 * time.Second)
+
+		response := Response{
+			Message: "Heavy task completed",
+			ProcessingTime: int64(time.Since(startTime).Milliseconds()),
+			ServedBy: instanceName,
+			Port: port,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+
+
+	}).Methods("GET")
 
 	fmt.Printf("🚀 API Service (%s) starting on port %s\n", instanceName, port)
 	log.Fatal(http.ListenAndServe(":" + port, router))
