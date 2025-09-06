@@ -51,9 +51,9 @@ func (s *Server) IsHealthy() bool {
 
 func NewLoadBalancer() *LoadBalancer {
 	servers := []Server{
-		{URL: parseURL("http://localhost:8081"), Healthy: true},
-		{URL: parseURL("http://localhost:8082"), Healthy: true},
-		{URL: parseURL("http://localhost:8083"), Healthy: true},
+		{URL: parseURL("http://host.docker.internal:8081"), Healthy: true},
+		{URL: parseURL("http://host.docker.internal:8082"), Healthy: true},
+		{URL: parseURL("http://host.docker.internal:8083"), Healthy: true},
 	}
 
 	return &LoadBalancer{
@@ -86,7 +86,7 @@ func (lb *LoadBalancer) HealthCheck() {
 	}
 
 	for {
-		log.Println("Performing health checks (/api/health) to each server")
+		log.Println("Performing health checks (/health) to each server")
 
 		for i := range lb.servers {
 			server := &lb.servers[i]
