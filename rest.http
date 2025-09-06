@@ -1,0 +1,16 @@
+### Loadbalancer Status
+GET http://localhost:9080/lb-status
+
+### Loadbalancer Get Users
+GET http://localhost:9080/api/users
+
+### Loadbalancer Do Heavy Task
+GET http://localhost:9080/api/heavy-task
+
+### Loadbalancer Create User
+POST http://localhost:9080/api/users HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Tanapat"
+}
