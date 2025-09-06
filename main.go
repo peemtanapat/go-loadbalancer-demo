@@ -13,7 +13,7 @@ import (
 
 type Response struct {
 	Status		string		`json:"status,omitempty"`
-	Instance 	string		`json:"instance,omitempty`
+	Instance 	string		`json:"instance,omitempty"`
 	Port      	string      `json:"port,omitempty"`
 	Timestamp 	time.Time   `json:"timestamp,omitempty"`
 	Users     	[]string    `json:"users,omitempty"`
@@ -40,6 +40,33 @@ func main() {
 		w.Header().Set("Content-type", "application/json")
 		json.NewEncoder(w).Encode(response)
 	}).Methods("GET")
+
+	router.HandleFunc("/api/users", func(w http.ResponseWriter, req *http.Request) {
+		switch req.Method {
+			case "GET":
+				response := Response{
+					Users: []string{"Alice", "Bird", "Charlie", "Dan"},
+					ServedBy: instanceName,
+					Port: port,
+				}
+
+				w.Header().Set("Content-type", "application/json")
+				json.NewEncoder(w).Encode(response)
+			case "POST":
+				var user any
+				json.NewDecoder(req.Body).Decode(&user)
+
+				response := Response{
+					Message: "User created successfully",
+					User: user,
+					ServedBy: instanceName,
+					Port: port,
+				}
+
+				w.Header().Set("Content-Type", "application/json")
+				json.NewEncoder(w).Encode(response)
+		}
+	}).Methods("GET", "POST")
 
 	fmt.Printf("🚀 API Service (%s) starting on port %s\n", instanceName, port)
 	log.Fatal(http.ListenAndServe(":" + port, router))
