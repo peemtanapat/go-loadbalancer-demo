@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -50,16 +52,12 @@ func (s *Server) IsHealthy() bool {
 }
 
 func NewLoadBalancer() *LoadBalancer {
-	servers := []Server{
-		{URL: parseURL("http://host.docker.internal:8081"), Healthy: true},
-		{URL: parseURL("http://host.docker.internal:8082"), Healthy: true},
-		{URL: parseURL("http://host.docker.internal:8083"), Healthy: true},
-	}
+ 	servers := getTargetServicesEnv()
 
-	return &LoadBalancer{
-		servers: servers,
-		current: 0,
-	}
+ 	return &LoadBalancer{
+ 		servers: servers,
+ 		current: 0,
+ 	}
 }
 
 // Round-robin algorithm
@@ -193,4 +191,23 @@ func parseURL(rawURL string) *url.URL {
 		log.Fatal(err)
 	}
 	return url
+}
+
+func getTargetServicesEnv() []Server {
+	targetServices := getEnv("TARGET_SERVICES", "http://localhost:8081,http://localhost:8082,http://localhost:8083")
+
+ 	servers := []Server{}
+
+ 	for _, value := range strings.Split(targetServices, ",") {
+ 		servers = append(servers, Server{URL: parseURL(value), Healthy: true})
+ 	}
+
+	return servers
+}
+
+func getEnv(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
 }
