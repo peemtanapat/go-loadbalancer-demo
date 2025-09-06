@@ -1,0 +1,16 @@
+FROM golang:alpine3.22 AS build
+
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY api/ ./
+RUN CGO_ENABLED=0 GOOS=linux go build -o apiservice user_api.go
+
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates
+WORKDIR /root
+COPY --from=build /app/apiservice .
+EXPOSE 8080
+CMD [ "./apiservice" ]

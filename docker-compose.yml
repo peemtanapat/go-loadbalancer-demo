@@ -1,0 +1,53 @@
+services:
+  api-service-1:
+    build:
+      context: .
+      dockerfile: Dockerfile.apiservice
+    ports:
+      - "8081:8080"
+    environment:
+      - PORT=8080
+      - INSTANCE_NAME=api-service-1
+    networks:
+      - go-load-balancer-network
+
+  api-service-2:
+    build:
+      context: .
+      dockerfile: Dockerfile.apiservice
+    ports:
+      - "8082:8080"
+    environment:
+      - PORT=8080
+      - INSTANCE_NAME=api-service-2
+    networks:
+      - go-load-balancer-network
+
+  api-service-3:
+    build:
+      context: .
+      dockerfile: Dockerfile.apiservice
+    ports:
+      - "8083:8080"
+    environment:
+      - PORT=8080
+      - INSTANCE_NAME=api-service-3
+    networks:
+      - go-load-balancer-network
+
+  go-loadbalancer:
+    build:
+      context: .
+      dockerfile: Dockerfile.loadbalancer
+    ports:
+      - "9080:9080"
+    networks:
+      - go-load-balancer-network
+    depends_on:
+      - api-service-1
+      - api-service-2
+      - api-service-3
+
+networks:
+  go-load-balancer-network:
+    driver: bridge
